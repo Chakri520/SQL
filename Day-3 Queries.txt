@@ -68,7 +68,7 @@ Select first_name,salary from employee where salary<(Select Avg(salary) from emp
 Select first_name,salary from employee where salary>(Select Avg(salary) from employee);
 
 
---2 nd highest salary
+--2 nd highest salary 
 
 Select first_name,salary from employee where salary=(Select max(salary) from employee where salary !=(Select Max(salary) from employee));
 
