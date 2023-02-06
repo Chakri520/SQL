@@ -1,0 +1,169 @@
+--joins
+
+select distinct supplier_id from lms_book_details;
+
+select supplier_id from lms_suppliers_details;
+
+
+--Outer Joins
+--inner join
+--right outer join
+--left outer join
+
+
+
+select l1.book_code,l1.book_title,l2.supplier_name,l2.supplier_id from 
+lms_book_details as l1 join lms_suppliers_details as l2 
+on l1.supplier_id=l2.supplier_id;
+
+
+select l1.book_code,l1.book_title,l2.supplier_name,l2.supplier_id from 
+lms_book_details as l1 right outer join lms_suppliers_details as l2 
+on l1.supplier_id=l2.supplier_id;
+
+
+select from lms_book_issue as l1 right join lms_members as l2 on 
+l1.members_id=l2.member_id;
+
+--left join 
+
+select l1.book_code,l1.book_title,l2.supplier_name,l2.supplier_id from 
+lms_book_details as l1 left outer join lms_suppliers_details as l2 
+on l1.supplier_id=l2.supplier_id;
+
+
+--full outer join 
+select l1.book_code,l1.book_title,l2.supplier_name,l2.supplier_id from 
+lms_book_details as l1 full outer join lms_suppliers_details as l2 
+on l1.supplier_id=l2.supplier_id;
+--display using where start with 's'
+select l1.book_code,l1.book_title,l2.supplier_name,l2.supplier_id from 
+lms_book_details as l1 full outer join lms_suppliers_details as l2 
+on l1.supplier_id=l2.supplier_id where l2.supplier_name like 's%';
+
+--having clause
+--find the supplier details who has supplied max num of books.
+select * from lms_book_details;
+select * from lms_supplier_details;
+
+select count(supplier_id) from lms_book_details group by supplier_id 
+having count(supplier_id)>=all(
+select count(supplier_id) from lms_book_details 
+group by supplier_id);
+
+--subquery ans
+--4
+--3
+--1
+
+--all(4,3,1)
+--(0,4,3,1)>=all(0,4,3,1)
+
+--0>=all(0,4,3,1)
+--4>=all(0,4,3,1)--- for all the comparision it will give a true
+--3>=all(0,4,3,1)
+--1>=all(0,4,3,1)
+
+select supplier_id, count(supplier_id) from lms_book_details 
+group by supplier_id having count(supplier_id) >2;
+
+--display the member who taken less than 2 books
+select member_id,count(book_code) from lms_book_issue 
+group by member_id having count(book_code)<2;
+
+select member_name,count(book_code) as noofbooks from lms_book_issue as l1 join 
+lms_members as l2 on l1.member_id=l2.member_id where member_name like 'A%'
+group by member_name having count(book_code)<2 order by member_name decs;
+
+
+
+select * from employee;
+
+select * from
+(select first_name,salary,dense_rank() over(order by salary desc) r from
+employee) as e where r=5;
+
+select * from employee as e1 where 2=
+(select count(distinct salary) from employee e2 where e2.salary>=e1.salary);
+
+select * from employee where salary =(select max(salary) from employee)
+
+
+create table emp
+(id int,
+name char(10),
+salary int
+);
+
+insert into emp values(1,'saran',45000),
+(2,'deepa',65000),(3,'ram',76000),(4,'john',35000);
+
+select * from emp;
+
+select * from emp as e1 where 2=
+(select count(distinct salary) from emp e2 where e2.salary>=e1.salary);
+
+
+   e2      e1
+--45000>=45000  no
+--65000>=45000  yes
+--76000>=45000  yes
+--35000>=45000  no
+
+
+   e2      e1
+--45000>=65000  no
+--65000>=65000  yes
+--76000>=65000  yes
+--35000>=65000  no
+
+ --2=1
+   e2      e1
+--45000>=76000  no
+--65000>=76000  no
+--76000>=76000  yes
+--35000>=76000  no
+
+
+-- 9.Write a query to display the date on which the maximum numbers of books were issued 
+     and the number of books issued with alias name “NOOFBOOKS”.
+
+     SELECT DATE_ISSUE,COUNT(DATE_ISSUE)
+     AS NOOFBOOKS FROM LMS_BOOK_ISSUE GROUP BY DATE_ISSUE HAVING 
+     COUNT(DATE_ISSUE)=(SELECT MAX(VALUE) FROM (SELECT COUNT(DATE_ISSUE) 
+     AS VALUE FROM LMS_BOOK_ISSUE GROUP BY DATE_ISSUE) AS P1)
+
+--14.Write a query to display the book code, book title ,supplier name and 
+     price of the book witch takes maximum price based on each supplier.
+
+     SELECT BOOK_CODE,BOOK_TITLE,SUPPLIER_NAME,PRICE FROM 
+     LMS_BOOK_DETAILS AS P1 JOIN LMS_SUPPLIERS_DETAILS AS P2
+     ON P1.SUPPLIER_ID=P2.SUPPLIER_ID WHERE PRICE=(SELECT MAX(PRICE) 
+     FROM LMS_BOOK_DETAILS);
+
+
+--17)Write a query to display the member id, member name, city and member status 
+     of members with the total fine paid by them with alias name “Fine”.
+
+     select l1.member_id,l1.member_name,l1.city,l1.membership_status,SUM(l3.fine_amount) as Fine from lms_members as l1 join 
+     lms_book_issue l2 on l1.member_id=l2.member_id join lms_fine_details as l3 on l2.fine_range=l3.fine_range  Group by 
+     l1.member_id,l1.member_name,l1.city,l1.membership_status;
+
+--1)Write a query to display the member id, member name of the members, book code and book title of the books taken by them.
+    
+    select distinct l1.member_id,l1.member_name,l3.book_code,l3.book_title from lms_members as l1 join 
+    lms_book_issue as l2 on l1.MEMBER_ID=l2.member_id join 
+    lms_book_details as l3 on l2.BOOK_CODE=l3.book_code;
+
+--6)Write a query to display the member id, member name, due date and date returned of the members who has returned the books after the due date.
+
+--Hint: Date_return is due date and Date_returned is actual book return date. 
+   
+    select l1.member_id,l1.member_name,l2.date_return,l2.date_returned from lms_members as l1 join 
+    lms_book_issue as l2 on l1.member_id=l2.member_id join 
+    lms_fine_details as l3 on l2.fine_range=l3.fine_range where l3.fine_amount>0;
+
+--7)Write a query to display the member id, member name and date of registration who have not taken any book. 
+    
+    select l1.member_id,l1.member_name,l1.date_register from lms_members as l1 join
+    lms_book_issue as l2 on l1.member_id=l2.member_id where l1.member_id!=l2.member_id;
