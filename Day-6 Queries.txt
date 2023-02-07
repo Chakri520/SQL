@@ -1,0 +1,151 @@
+use lms_db;
+
+
+--display the booktitle, supplier name who has supplied the books and the member name who
+--has taken the book from the library
+
+
+select * from lms_book_details;
+select * from lms_suppliers_details;
+select * from lms_members;
+select * from lms_book_issue;
+
+
+
+select  l1.book_title,l2.supplier_name,l4.ember_name
+from lms_book_details as l1 join lms_suppliers_details as l2
+on l1.supplier_id=l2.supplier_id
+join lms_book_issue as l3 on l3.book_code=l1.book_code join
+lms_members as l4 on l4.member_id=l3.member_id;
+
+
+
+--time taken for compilation
+
+--20s + time aken for fetch / execute (20s) == 40s
+
+--real time applications
+
+--join query
+
+--10 tables, 15 cols, group by , where , having , subqueries
+
+--1 min+1 min==>2 mins
+
+--2 * 4 => 8 mins
+
+--stored procedures --pre ompiled statements
+
+--c block statements {.... }
+
+--c if(conditios)
+
+--sql block statements begin ..... end
+
+
+
+alter proc usp_fetchbookdetails
+as
+begin
+select 1.book_title,l2.supplier_name,l4.member_name
+from lms_book_details as l1 join lms_suppliers_details as l2
+on l1.supplier_id=l2.supplier_id
+join lms_book_issue as l3 on l3.book_code=l1.book_code join
+lms_members as l4 on l4.member_id=l3.member_id;
+end
+
+
+execute usp_fetchbookdetails;
+
+
+insert into lms_fine_details values('r12',325)
+
+
+select * from lms_fine_details;
+
+
+alter proc usp_addfine
+(@fr char(5), @fa int)
+as
+begin
+insert into lms_fine_details values(@fr,@fa);
+select * from lms_fine_details;
+end
+
+
+execute usp_addfine 'r10',300
+
+
+alter table lms_fine_details drop column c1;
+
+
+--ddl
+
+
+
+create proc usp_ddl
+as
+begin
+alter table lms_fine_ddetails and c1 int
+end
+
+
+
+--creating the view - virtual table
+
+
+create view vw_book_details
+as
+
+select l2.book_title,l2.supplier_name,l4.member_name
+frmo lms_book_details as l1 join lms_suppliers_details as l2
+on l1.supplier_id=l2.supplier_id
+join lms_book_issue as l3 on l3.book_code=l1.book_code join
+lms_members as l4 on l4.member_id=l3.member_id;
+
+
+select * from vw_book_details where supplier_name like 's%';
+
+
+--triggers = alarm thing or like auto notifications
+
+
+
+select * from lms_fine_details;
+
+
+create trigger trg_insertfine
+on lms_fine_details
+for insert as
+begin
+print 'a new row added'
+end
+
+
+create trigger trg_deletefine
+on lms_fine_details
+for delete as
+begin
+print 'a row updated in fine details table'
+end
+
+
+create trigger trg_deletefine
+on lms_fine_details
+for delete as
+begin
+rollack--undo changes
+print 'not allowed to delete'
+end
+
+
+delete from lms_fine_details where fine_range='r11';
+
+
+enable trigger trg_deletefine on lms_fine_details;
+
+
+--disable trigger trg_deletefine on lms_fine_details;
+
+
+update lms_fine_details set fine_amount=350 wherre fine_range='r12'
